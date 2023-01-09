@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:insets="https://schemas.the49.com/dotnet/2023/maui"
+             x:Class="The49.Maui.Insets.Sample.MainPage"
+             x:Name="this"
+             Shell.NavBarIsVisible="False"
+             insets:Insets.EdgeToEdge="{Binding ShouldUseEdgeToEdge, Source={x:Reference this}}"
+             insets:Insets.StatusBarStyle="{Binding StatusBarStyle, Source={x:Reference this}}"
+             Title="FullWindowPage">
+    <Grid RowDefinitions="Auto, *">
+        <AbsoluteLayout>
+            <Image Source="curry.jpg" Aspect="AspectFill" AbsoluteLayout.LayoutBounds="0,0, 1, 1" AbsoluteLayout.LayoutFlags="SizeProportional" />
+            <insets:TopInsetView BackgroundColor="#77000000" HorizontalOptions="FillAndExpand" AbsoluteLayout.LayoutBounds="0,0, 1, -1" AbsoluteLayout.LayoutFlags="WidthProportional">
+                <ContentView HeightRequest="120">
+                    <VerticalStackLayout VerticalOptions="End" Padding="0, 0, 0, 16">
+                        <Label Text="Maui.Insets" TextColor="White" FontSize="32" LineHeight="1.5" Margin="8, 0" />
+                        <Label Text="Expand your content edge-to-edge" TextColor="White" Margin="8, 0" />
+                        <Label Text="and control the window insets yourself" TextColor="White" Margin="8, 0" />
+                    </VerticalStackLayout>
+                </ContentView>
+            </insets:TopInsetView>
+        </AbsoluteLayout>
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout>
+                <Grid ColumnDefinitions="*, Auto" Padding="16, 0">
+                    <Label 
+                        Text="Extend the page to the edges of the screen"
+                        VerticalOptions="Center" />
+                    <Switch Grid.Column="1" IsToggled="{Binding ShouldUseEdgeToEdge, Source={x:Reference this}}" />
+                </Grid>
+                <Grid ColumnDefinitions="*, Auto" Padding="16, 0">
+                    <Label 
+                        Text="Use light style statusbar"
+                        VerticalOptions="Center" />
+                    <Switch Grid.Column="1" IsToggled="{Binding ShouldUseLightStyle, Mode=TwoWay, Source={x:Reference this}}" />
+                </Grid>
+                <Grid ColumnDefinitions="*, Auto" Padding="16, 0">
+                    <Label 
+                        Text="Checkout out the salmon demo"
+                        VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="preview" Clicked="Button_Clicked" />
+                </Grid>
+                <VerticalStackLayout Spacing="16" Padding="16, 32">
+                    <Label Text="The current page is represented in green" FontSize="16" />
+                    <Border Stroke="Transparent" HeightRequest="320" WidthRequest="240" BackgroundColor="Black" Padding="{Binding SimulatedDeviceInsets, Source={x:Reference this}}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="8" />
+                        </Border.StrokeShape>
+                        <BoxView Color="Green" />
+                    </Border>
+                </VerticalStackLayout>
+                <insets:BottomInsetView>
+                    <VerticalStackLayout Padding="16, 0" Spacing="16">
+                        <Label Text="What the hell is lorem ipsum?" FontSize="24" LineHeight="1.5" />
+                        <Label Text="For those of you not of a design disposition, lorem ipsum is dummy text used as a placeholder for the real text of a website or other mockup during the design process. Although it may look like Latin, it’s actually just gibberish designed to be ignored. Any time you see lorem ipsum, just think “real text will be here eventually”. It looks like this " />
+                        <Label Text="Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exercitation ullam corper suscipit lobortis nisl ut aliquip ex ea commodo consequat." />
+                    </VerticalStackLayout>
+                </insets:BottomInsetView>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
