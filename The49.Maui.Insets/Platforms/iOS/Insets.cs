@@ -1,10 +1,21 @@
-﻿using Foundation;
+﻿using System.Runtime.CompilerServices;
+using Foundation;
 using UIKit;
 
 namespace The49.Maui.Insets;
 
 public partial class Insets
 {
+    public Thickness NegativeInsetsThickness => new Thickness(-InsetsThickness.Left, -InsetsThickness.Top, -InsetsThickness.Right, -InsetsThickness.Bottom);
+
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        base.OnPropertyChanged(propertyName);
+        if (propertyName == nameof(InsetsThickness))
+        {
+            OnPropertyChanged(nameof(NegativeInsetsThickness));
+        }
+    }
     static partial void PlatformInit(Page page)
     {
         var insets = UIApplication.SharedApplication.KeyWindow.SafeAreaInsets;
@@ -12,13 +23,13 @@ public partial class Insets
     }
     static partial void UpdateEdgeToEdge(Page page)
     {
-        var useFullWindow = GetEdgeToEdge(page);
+        var edgeToEdge = GetEdgeToEdge(page);
 
-        if (useFullWindow)
+        if (edgeToEdge)
         {
             Current.SetEnabled(true);
             Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page.SetUseSafeArea(page, false);
-            page.SetBinding(Page.PaddingProperty, new Binding(nameof(Insets.InsetsThickness), source: Current));
+            page.SetBinding(Page.PaddingProperty, new Binding(nameof(NegativeInsetsThickness), source: Current));
         }
         else
         {
@@ -31,9 +42,9 @@ public partial class Insets
     static partial void UpdateStatusBarStyle(Page page)
     {
         var style = GetStatusBarStyle(page);
-        var useFullWindow = GetEdgeToEdge(page);
+        var edgeToEdge = GetEdgeToEdge(page);
 
-        if (!useFullWindow)
+        if (!edgeToEdge)
         {
             UIApplication.SharedApplication.SetStatusBarStyle(UIStatusBarStyle.Default, false);
         }
