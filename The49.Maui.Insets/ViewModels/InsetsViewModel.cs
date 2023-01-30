@@ -1,4 +1,6 @@
-﻿namespace The49.Maui.Insets;
+﻿using Microsoft.Maui.Handlers;
+
+namespace The49.Maui.Insets;
 
 public enum StatusBarStyle
 {
@@ -13,6 +15,15 @@ public partial class Insets : BindableObject
 
     public static readonly BindableProperty EdgeToEdgeProperty = BindableProperty.CreateAttached("EdgeToEdge", typeof(bool), typeof(Insets), false, propertyChanged: EdgeToEdgeChanged);
     public static readonly BindableProperty StatusBarStyleProperty = BindableProperty.CreateAttached("StatusBarStyle", typeof(StatusBarStyle), typeof(Insets), StatusBarStyle.Default, propertyChanged: StatusBarStyleChanged);
+    public static readonly BindableProperty CancelIOSPaddingProperty = BindableProperty.CreateAttached("CancelIOSPadding", typeof(bool), typeof(Insets), false, propertyChanged: CancelIOSPaddingChanged);
+
+    private static void CancelIOSPaddingChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is Layout layout)
+        {
+            UpdateIOSPadding(layout);
+        }
+    }
 
     static void StatusBarStyleChanged(BindableObject bindable, object oldValue, object newValue)
     {
@@ -32,6 +43,7 @@ public partial class Insets : BindableObject
     }
 
     static partial void UpdateEdgeToEdge(Page page);
+    static partial void UpdateIOSPadding(Layout layout);
     static partial void UpdateStatusBarStyle(Page page);
     static partial void PlatformInit(Page page);
 
@@ -45,7 +57,6 @@ public partial class Insets : BindableObject
         OnPropertyChanged(nameof(InsetsThickness));
         OnPropertyChanged(nameof(TopInsetThickness));
         OnPropertyChanged(nameof(BottomInsetThickness));
-        OnPropertyChanged(nameof(DeviceInsetsThickness));
     }
 
     internal void SetInsets(Thickness insets)
@@ -57,29 +68,22 @@ public partial class Insets : BindableObject
         OnPropertyChanged(nameof(DeviceInsetsThickness));
     }
 
-    internal void ClearInsets()
-    {
-        SetInsets(new Thickness(0));
-    }
-
     internal void Init(Page mainPage)
     {
-        if (mainPage is Shell shell)
+        PageHandler.Mapper.PrependToMapping("_", (h, v) =>
         {
-            shell.Navigated += (s, e) =>
+            var page = (Page)v;
+            if (page.Window is not null)
             {
-                UpdateEdgeToEdge(shell.CurrentPage);
-                UpdateStatusBarStyle(shell.CurrentPage);
-            };
-        }
-        else if (mainPage is NavigationPage navigationPage)
-        {
-            navigationPage.NavigatedTo += (s, e) =>
+                UpdateEdgeToEdge(page);
+                UpdateStatusBarStyle(page);
+            }
+            page.Appearing += (s, e) =>
             {
-                UpdateEdgeToEdge(navigationPage.CurrentPage);
-                UpdateStatusBarStyle(navigationPage.CurrentPage);
+                UpdateEdgeToEdge(page);
+                UpdateStatusBarStyle(page);
             };
-        }
+        });
         PlatformInit(mainPage);
     }
 
@@ -106,5 +110,14 @@ public partial class Insets : BindableObject
     public static void SetStatusBarStyle(BindableObject target, StatusBarStyle value)
     {
         target.SetValue(StatusBarStyleProperty, value);
+    }
+    public static bool GetCancelIOSPadding(BindableObject target)
+    {
+        return (bool)target.GetValue(CancelIOSPaddingProperty);
+    }
+
+    public static void SetCancelIOSPadding(BindableObject target, bool value)
+    {
+        target.SetValue(CancelIOSPaddingProperty, value);
     }
 }
