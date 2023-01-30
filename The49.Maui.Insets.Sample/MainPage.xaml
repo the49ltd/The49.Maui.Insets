@@ -8,8 +8,8 @@
              insets:Insets.EdgeToEdge="{Binding ShouldUseEdgeToEdge, Source={x:Reference this}}"
              insets:Insets.StatusBarStyle="{Binding StatusBarStyle, Source={x:Reference this}}"
              Title="FullWindowPage">
-    <Grid RowDefinitions="Auto, *">
-        <AbsoluteLayout>
+    <Grid RowDefinitions="Auto, *" insets:Insets.CancelIOSPadding="True">
+        <AbsoluteLayout insets:Insets.CancelIOSPadding="True">
             <Image Source="curry.jpg" Aspect="AspectFill" AbsoluteLayout.LayoutBounds="0,0, 1, 1" AbsoluteLayout.LayoutFlags="SizeProportional" />
             <insets:TopInsetView BackgroundColor="#77000000" HorizontalOptions="FillAndExpand" AbsoluteLayout.LayoutBounds="0,0, 1, -1" AbsoluteLayout.LayoutFlags="WidthProportional">
                 <ContentView HeightRequest="120">

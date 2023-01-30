@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using Foundation;
+using Microsoft.Maui.Handlers;
 using UIKit;
 
 namespace The49.Maui.Insets;
@@ -18,8 +19,19 @@ public partial class Insets
     }
     static partial void PlatformInit(Page page)
     {
-        var insets = UIApplication.SharedApplication.KeyWindow.SafeAreaInsets;
+        var insets = UIApplication.SharedApplication.GetSafeAreaInsetsForWindow();
         Current.SetInsets(new Thickness(insets.Left, insets.Top, insets.Right, insets.Bottom));
+    }
+    static partial void UpdateIOSPadding(Layout layout)
+    {
+        if (GetCancelIOSPadding(layout))
+        {
+            layout.SetBinding(Layout.PaddingProperty, new Binding(nameof(NegativeInsetsThickness), source: Current));
+        }
+        else
+        {
+            layout.RemoveBinding(Layout.PaddingProperty);
+        }
     }
     static partial void UpdateEdgeToEdge(Page page)
     {
@@ -28,13 +40,11 @@ public partial class Insets
         if (edgeToEdge)
         {
             Current.SetEnabled(true);
-            Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page.SetUseSafeArea(page, false);
             page.SetBinding(Page.PaddingProperty, new Binding(nameof(NegativeInsetsThickness), source: Current));
         }
         else
         {
             Current.SetEnabled(false);
-            Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific.Page.SetUseSafeArea(page, true);
             page.RemoveBinding(Page.PaddingProperty);
         }
     }

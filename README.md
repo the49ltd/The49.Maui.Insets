@@ -139,6 +139,34 @@ The previous example can be simplified with the following for example:
 ```
 
 
+## Issues
+
+On iOS, there is en open issue with the `IgnoreSafeArea` propety of .NET MAUI's Layout views. This means that even with the edge-to-edge enabled, layouts inside the safe area will get a padding added (not a .NET MAUI padding, the bounds calculation at the iOS level is overriden). Unfortunately, there is no easy workaround that can be implemented in this library.
+
+To help with this issue, the `bool` property `CancelIOSPadding` has been added. Set the property to true for all the layouts that are parents of your inset padding:
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:insets="https://schemas.the49.com/dotnet/2023/maui"
+             x:Class="The49.Maui.Insets.Sample.SalmonPage"
+             insets:Insets.EdgeToEdge="True"
+             Shell.NavBarIsVisible="False"
+             Title="SalmonPage">
+    <Grid RowDefinitions="Auto, Auto, *, Auto, Auto" insets:Insets.CancelIOSPadding="True">
+        <insets:TopInsetView Background="Salmon">
+            <Label Text="Main Page" Padding="16" FontSize="22" TextColor="White" HorizontalOptions="Center" />
+        </insets:TopInsetView>
+        <Label Text="^^^ This view is padded to avoid colliding with the status bar ^^^" FontSize="12" HorizontalTextAlignment="Center" Grid.Row="1" />
+        <Label Text="vvv This view is padded to avoid colliding with navigation bar vvv" FontSize="12" HorizontalTextAlignment="Center" Grid.Row="3" />
+        <insets:BottomInsetView Background="Salmon" Grid.Row="4">
+            <Label Text="Footer" FontSize="22" TextColor="White" HorizontalOptions="Center" />
+        </insets:BottomInsetView>
+    </Grid>
+</ContentPage>
+```
+
 ---
 
 
