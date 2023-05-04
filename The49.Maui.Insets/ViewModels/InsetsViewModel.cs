@@ -35,11 +35,49 @@ public partial class Insets : BindableObject
 
     static void EdgeToEdgeChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is Page page && page.Window != null)
+
+        if (bindable is Page page)
         {
-            UpdateEdgeToEdge(page);
-            UpdateStatusBarStyle(page);
+            if (page.Window != null)
+            {
+                UpdateEdgeToEdge(page);
+                UpdateStatusBarStyle(page);
+
+            }
+            else
+            {
+                page.PropertyChanged += PagePropertyChanged;
+            }
         }
+    }
+
+    private static void PagePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        var page = (Page)sender;
+        if (e.PropertyName == "Window")
+        {
+            page.PropertyChanged -= PagePropertyChanged;
+            if (page.Window.Handler is null)
+            {
+                void WindowHandlerChanged(object sender, EventArgs e)
+                {
+                    var window = (Window)sender;
+                    window.PropertyChanged -= WindowHandlerChanged;
+                    SetupPage(page);
+                }
+                page.Window.HandlerChanged += WindowHandlerChanged;
+            }
+            else
+            {
+                SetupPage(page);
+            }
+        }
+    }
+
+    static void SetupPage(Page page)
+    {
+        UpdateEdgeToEdge(page);
+        UpdateStatusBarStyle(page);
     }
 
     static partial void UpdateEdgeToEdge(Page page);

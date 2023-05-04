@@ -1,6 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using Foundation;
-using Microsoft.Maui.Handlers;
 using UIKit;
 
 namespace The49.Maui.Insets;
