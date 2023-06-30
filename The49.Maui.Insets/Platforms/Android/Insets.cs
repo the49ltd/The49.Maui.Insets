@@ -1,23 +1,19 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Views;
+using AndroidX.AppCompat.App;
 using AndroidX.Core.View;
+using Microsoft.Maui.Controls.Platform.Compatibility;
 using AWindow = Android.Views.Window;
 
 namespace The49.Maui.Insets;
 
 public class InsetsOnApplyWindowInsetsListener : Java.Lang.Object, IOnApplyWindowInsetsListener
 {
-    bool _enabled = false;
-    internal void SetEnabled(bool enabled)
-    {
-        _enabled = enabled;
-    }
     public WindowInsetsCompat OnApplyWindowInsets(Android.Views.View v, WindowInsetsCompat windowInsets)
     {
-        var insets = windowInsets.GetInsets(WindowInsetsCompat.Type.SystemBars());
         Insets.Current.SetInsets(windowInsets.ToThickness());
-        return ViewCompat.OnApplyWindowInsets(v, _enabled ? windowInsets.Inset(insets) : windowInsets);
+        return ViewCompat.OnApplyWindowInsets(v, windowInsets);
     }
 }
 
@@ -39,21 +35,41 @@ public partial class Insets
     }
     static partial void UpdateEdgeToEdge(Page page)
     {
-        var activity = Platform.CurrentActivity;
+        var activity = Platform.CurrentActivity as AppCompatActivity;
         var edgeToEdge = GetEdgeToEdge(page);
 
         if (edgeToEdge)
         {
-            _listener.SetEnabled(true);
+            activity.Window.SetFlags(WindowManagerFlags.LayoutNoLimits, WindowManagerFlags.LayoutNoLimits);
             Current.SetEnabled(true);
         }
         else
         {
-            _listener.SetEnabled(false);
+            activity.Window.ClearFlags(WindowManagerFlags.LayoutNoLimits);
             Current.SetEnabled(false);
-
         }
         WindowCompat.SetDecorFitsSystemWindows(activity.Window, !edgeToEdge);
+
+
+        // Some parts of Shell cancel the fitsSystemWindows and prevent this from working
+        // Adding this makes sure it resets this
+        // Another way would be to consume the insets at the top, but a lot of other
+        // parts of an Android app can rely on reading the insets
+        if (Shell.Current is not null)
+        {
+            var renderer = Shell.Current.Handler;
+
+            var pv = renderer.PlatformView as ViewGroup;
+
+            for (var i = 0; i < pv.ChildCount; i++)
+            {
+                if (pv.GetChildAt(i) is CustomFrameLayout cfl)
+                {
+                    cfl.SetFitsSystemWindows(!edgeToEdge);
+                }
+            }
+        }
+
     }
 
     static partial void UpdateStatusBarStyle(Page page)
