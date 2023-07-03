@@ -35,7 +35,7 @@ public partial class Insets
     }
     static partial void UpdateEdgeToEdge(Page page)
     {
-        var activity = Platform.CurrentActivity as AppCompatActivity;
+        var activity = page.Window.Handler.MauiContext.Context as AppCompatActivity;
         var edgeToEdge = GetEdgeToEdge(page);
 
         if (edgeToEdge)
