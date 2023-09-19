@@ -35,15 +35,22 @@ public partial class Insets
     {
         var edgeToEdge = GetEdgeToEdge(page);
 
+        var runtimeVersion = Environment.Version;
         if (edgeToEdge)
         {
             Current.SetEnabled(true);
-            page.SetBinding(Page.PaddingProperty, new Binding(nameof(NegativeInsetsThickness), source: Current));
+            if (runtimeVersion.Major < 8)
+            {
+                page.SetBinding(Page.PaddingProperty, new Binding(nameof(NegativeInsetsThickness), source: Current));
+            }
         }
         else
         {
             Current.SetEnabled(false);
-            page.RemoveBinding(Page.PaddingProperty);
+            if (runtimeVersion.Major < 8)
+            {
+                page.RemoveBinding(Page.PaddingProperty);
+            }
         }
     }
 
